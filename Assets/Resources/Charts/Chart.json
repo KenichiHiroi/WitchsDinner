@@ -1,0 +1,23 @@
+{
+	"title": "Pop_swing",
+	"bpm": "120",
+	"length": "102000",
+	"notes":[
+		{"timing": "3000", "type": "Vegetables"},
+		{"timing": "4000", "type": "Meat"},
+		{"timing": "8000", "type": "Vegetables"},
+		{"timing": "9000", "type": "Vegetables"},
+		{"timing": "10000", "type": "Vegetables"},
+		{"timing": "11000", "type": "Vegetables"},
+		{"timing": "12000", "type": "Vegetables"},
+		{"timing": "13000", "type": "Vegetables"},
+		{"timing": "14000", "type": "Vegetables"},
+		{"timing": "15000", "type": "Vegetables"},
+		{"timing": "16000", "type": "Vegetables"},
+		{"timing": "17000", "type": "Vegetables"},
+		{"timing": "18000", "type": "Vegetables"},
+		{"timing": "19000", "type": "Vegetables"},
+		{"timing": "20000", "type": "Vegetables"},
+
+	]
+}
