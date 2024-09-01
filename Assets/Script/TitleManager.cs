@@ -14,7 +14,10 @@ public class TitleManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(Time.time * 1000 >= 3000)
+        {
+            SceneManager.LoadScene("MainScene");
+        }
     }
 
     public void GetPlayButtonDown()

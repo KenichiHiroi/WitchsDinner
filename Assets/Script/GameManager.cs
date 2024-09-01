@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] string ChartPath;  //譜面ファイルのパス
     [SerializeField] string MusicPath;  //楽曲ファイルのパス
+    public AudioClip BGM;
 
     [SerializeField] GameObject Vegetables; //通常ノーツのプレファブ
     [SerializeField] GameObject Meat;       //特殊ノーツのプレファブ
@@ -51,9 +52,16 @@ public class GameManager : MonoBehaviour
     Text NowTimeText;
     float NowTime;
 
+    //問題調査用
+    float LoadTime;
+
+    float ingameTime;
+
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("Start Time" + Time.time * 1000);
+
         DistanceX = Mathf.Abs(BeatPoint.position.x-SpawnPoint.position.x);
         DistanceY = Mathf.Abs(BeatPoint.position.y-SpawnPoint.position.y);
         During = 600;
@@ -68,10 +76,15 @@ public class GameManager : MonoBehaviour
         TotalScore = 0;
 
         SEController = GameObject.Find("SoundEffectController");
+        LoadTime = Time.time*1000;
 
 
         loadChart();
         loadMusic();
+
+        //Music.Play();
+        //PlayTime = Time.time * 1000;
+        //isPlaying = true;
 
         NowTimeText = TimeText.GetComponent<Text>();
 
@@ -83,6 +96,15 @@ public class GameManager : MonoBehaviour
         NowTime = Time.time * 1000 - PlayTime;
         NowTimeText.text = NowTime.ToString();
 
+
+        if (isPlaying == false
+            && (Time.time * 1000 - LoadTime) >= 3000)
+        {
+            Debug.Log("音楽開始：" + Time.time * 1000);
+            Music.Play();
+            PlayTime = Time.time * 1000;
+            isPlaying = true;
+        }
 
 
         if (isPlaying
@@ -111,15 +133,10 @@ public class GameManager : MonoBehaviour
             && Notes.Count > GoIndex
             && Notes[GoIndex].GetComponent<NoteController>().getTiming() <= (Time.time * 1000 - PlayTime) + During) //次のノーツの始動タイミングと現在の進行具合
         {
-            //Debug.Log("ノーツのタイプを取得：" + Notes[GoIndex].GetComponent<NoteController>().getType());
-            Debug.Log("Time.time:" + Time.time);
-            Debug.Log("PlayTime:" + PlayTime);
-
-            Debug.Log("(Time.time * 1000 - PlayTime) + During:" + ((Time.time * 1000 - PlayTime) + During));
-            Debug.Log("Nowtime:" + NowTime);
-
             Notes[GoIndex].GetComponent<NoteController>().go(DistanceX,DistanceY, During); //go関数を呼び出す
+            Debug.Log("go関数：" + Time.time * 1000);
             GoIndex++;
+
         }
 
         if(Time.time - PlayTime > SongLength)
@@ -169,9 +186,6 @@ public class GameManager : MonoBehaviour
         //取得したノーツの数を元にノーツごとの得点を計算する
         AddPoint = 100 / Notes.Count;
 
-        //Debug.Log("取得したノーツ数：" + Notes.Count);
-        //Debug.Log("1ノーツあたりの得点：" + AddPoint);
-
         Debug.Log("Finish loadChart()");
     }
 
@@ -181,11 +195,10 @@ public class GameManager : MonoBehaviour
         Music.clip = (AudioClip)Resources.Load(MusicPath);
 
         Music.Stop();
-        Music.Play();
-
-        PlayTime = Time.time * 1000;
-        isPlaying = true;
-        Debug.Log("PlayTime:" + PlayTime);
+        ////Music.Play();
+        //Debug.Log("音楽開始：" + Time.time * 1000);
+        //PlayTime = Time.time * 1000;
+        //isPlaying = true;
 
         Debug.Log("Finish loadMusic()");
     }
@@ -214,9 +227,6 @@ public class GameManager : MonoBehaviour
 
         }
 
-        //Debug.Log("対象ノーツの番号：" + minDiffIndex + " 対象ノーツの押下タイミング:" + NoteTiming[minDiffIndex]
-        //    + "\n   timing(タップしたタイミング):" + timing + " minDiff(対象ノーツの押下タイミングとの差):" + minDiff);
-
         //対象ノーツの押下タイミングとの差に応じて評価を行う
         if (minDiff != -1 & minDiff < CheckRange)    //並以上の評価の場合は次に進む
         {
@@ -227,10 +237,7 @@ public class GameManager : MonoBehaviour
 
                 NoteTiming[minDiffIndex] = -1;          //判定を行ったノーツの押下タイミング値を-1に書き換える
                 Notes[minDiffIndex].SetActive(false);   //対象のノーツを非表示にする
-                TotalScore += AddPoint;
-                //Debug.Log("押下タイミングの評価：良");
-                //Debug.Log("現在の得点：" + TotalScore);
-                
+                TotalScore += AddPoint;                
             }
             else //並評価の処理
             {
@@ -239,17 +246,11 @@ public class GameManager : MonoBehaviour
                 NoteTiming[minDiffIndex] = -1;          //判定を行ったノーツの押下タイミング値を-1に書き換える
                 Notes[minDiffIndex].SetActive(false);   //対象のノーツを非表示にする
                 TotalScore += AddPoint / 2;
-
-                //Debug.Log("押下タイミングの評価：並");
-                //Debug.Log("現在の得点：" + TotalScore);
-
             }
         }
         else //不可評価の処理
         {
             SEController.GetComponent<SoundEffectController>().PlaySE_BeatMiss();
-
-            //Debug.Log("押下タイミングの評価：不可");
         }
 
     }

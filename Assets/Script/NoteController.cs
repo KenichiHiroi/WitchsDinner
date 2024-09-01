@@ -66,6 +66,5 @@ public class NoteController : MonoBehaviour
         GoTime = Time.time * 1000;
         isGo = true;    //始動フラグをTrueに変更してノーツを動かす
         SEController.GetComponent<SoundEffectController>().PlaySE_ThrowNotes();
-        Debug.Log("GoTime:" + GoTime);
     }
 }
