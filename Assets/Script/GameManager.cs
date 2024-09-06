@@ -13,8 +13,18 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject Vegetables; //通常ノーツのプレファブ
     [SerializeField] GameObject Meat;       //特殊ノーツのプレファブ
 
-    [SerializeField] Transform SpawnPoint;  //ノーツの出現位置
-    [SerializeField] Transform BeatPoint;   //ノーツの押下位置
+    [SerializeField] Transform SpawnPointTransform;  //ノーツの出現位置
+    [SerializeField] Transform BeatPointTransform;   //ノーツの押下位置
+    
+    [SerializeField] GameObject SpawnPoint;
+    [SerializeField] GameObject BeatPoint;
+    Vector3 SpawnPosition;
+    Vector3 BeatPosition;
+    float ParabolaHeight;
+    float ParabolaHeightMeat;   //放物線の高さ
+    float ParabolaHeightVegetables;   //放物線の高さ
+
+
 
     //ノーツ管理用
     string Title;           //楽曲タイトル
@@ -62,8 +72,15 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Start Time" + Time.time * 1000);
 
-        DistanceX = Mathf.Abs(BeatPoint.position.x-SpawnPoint.position.x);
-        DistanceY = Mathf.Abs(BeatPoint.position.y-SpawnPoint.position.y);
+        DistanceX = Mathf.Abs(BeatPointTransform.position.x-SpawnPointTransform.position.x);
+        DistanceY = Mathf.Abs(BeatPointTransform.position.y-SpawnPointTransform.position.y);
+        SpawnPosition = new Vector3(SpawnPoint.transform.position.x, SpawnPoint.transform.position.y, 0);
+        BeatPosition = new Vector3(BeatPoint.transform.position.x, BeatPoint.transform.position.y, 0);
+
+        ParabolaHeightVegetables = 4;
+        ParabolaHeightMeat = 6;
+
+
         During = 600;
         DuringVege = 500;
         DuringMeat = 1000;
@@ -98,7 +115,7 @@ public class GameManager : MonoBehaviour
 
 
         if (isPlaying == false
-            && (Time.time * 1000 - LoadTime) >= 3000)
+            && (Time.time * 1000 - LoadTime) >= 2000)
         {
             Debug.Log("音楽開始：" + Time.time * 1000);
             Music.Play();
@@ -120,10 +137,12 @@ public class GameManager : MonoBehaviour
             if(Notes[GoIndex].GetComponent<NoteController>().getType() == "Meat")
             {
                 During = DuringMeat;
+                ParabolaHeight = ParabolaHeightMeat;
             }
             else
             {
                 During = DuringVege;
+                ParabolaHeight = ParabolaHeightVegetables;
             }
 
         }
@@ -131,15 +150,16 @@ public class GameManager : MonoBehaviour
 
         if(isPlaying
             && Notes.Count > GoIndex
-            && Notes[GoIndex].GetComponent<NoteController>().getTiming() <= (Time.time * 1000 - PlayTime) + During) //次のノーツの始動タイミングと現在の進行具合
+            && Notes[GoIndex].GetComponent<NoteController>().getTiming() <= (Time.time * 1000 - PlayTime) + During) //次のノーツの押下タイミングと（現在の時間+飛翔時間）を比較し、始動タイミングか判定する
         {
-            Notes[GoIndex].GetComponent<NoteController>().go(DistanceX,DistanceY, During); //go関数を呼び出す
+            //Notes[GoIndex].GetComponent<NoteController>().go(DistanceX,DistanceY, During); //go関数を呼び出す
+            Notes[GoIndex].GetComponent<NoteController>().StartThrow(ParabolaHeight, SpawnPosition, BeatPosition, During); //対象ノーツの始動関数を呼び出す
             Debug.Log("go関数：" + Time.time * 1000);
             GoIndex++;
 
         }
 
-        if(Time.time - PlayTime > SongLength)
+        if(Time.time * 1000 - PlayTime > SongLength)
         {
             SceneManager.LoadScene("Result");
         }
@@ -165,15 +185,15 @@ public class GameManager : MonoBehaviour
             GameObject Note;
             if(type == "Vegetables")
             {
-                Note = Instantiate(Vegetables, SpawnPoint.position, Quaternion.identity);   //Instantiate(生成するオブジェクト, 位置, 回転) Quaternion.identity → 回転させない
+                Note = Instantiate(Vegetables, SpawnPointTransform.position, Quaternion.identity);   //Instantiate(生成するオブジェクト, 位置, 回転) Quaternion.identity → 回転させない
             }
             else if(type == "Meat")
             {
-                Note = Instantiate(Meat, SpawnPoint.position, Quaternion.identity);
+                Note = Instantiate(Meat, SpawnPointTransform.position, Quaternion.identity);
             }
             else
             {
-                Note = Instantiate(Vegetables, SpawnPoint.position, Quaternion.identity);       //例外は通常ノーツ
+                Note = Instantiate(Vegetables, SpawnPointTransform.position, Quaternion.identity);       //例外は通常ノーツ
             }
 
             //setParameter関数を実行
