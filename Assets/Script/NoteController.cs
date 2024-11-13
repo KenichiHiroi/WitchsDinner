@@ -18,6 +18,11 @@ public class NoteController : MonoBehaviour
 
     float GoTime;   //
 
+    GameObject BeatPoint;   //押下位置
+    GameObject HidePoint;
+    bool isBeatPoint;
+    float afterBeatPointDuration;
+
     GameObject SEController;    //ノーツ始動時のSE再生で利用
 
     // Start is called before the first frame update
@@ -26,16 +31,37 @@ public class NoteController : MonoBehaviour
         isGo = false;
         firstPos = this.transform.position;
 
+        BeatPoint = GameObject.Find("BeatPoint");
+        HidePoint = GameObject.Find("HidePoint");
+        isBeatPoint = false;
+
         SEController = GameObject.Find("SoundEffectController");
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(isGo)
+        //if(isGo)
+        //{
+        //    //ノーツの位置を計算して移動させる
+        //    this.gameObject.transform.position = new Vector3(firstPos.x - DistanceX * (Time.time * 1000 - GoTime) / During, firstPos.y + DistanceY * (Time.time * 1000 - GoTime) / During, firstPos.z);
+        //}
+
+        //押下位置に到達した場合、フラグを真に変更して移動開始時間を記録する
+        if(this.gameObject.transform.position == BeatPoint.transform.position
+            && isBeatPoint == false)
         {
-            //ノーツの位置を計算して移動させる
-            this.gameObject.transform.position = new Vector3(firstPos.x - DistanceX * (Time.time * 1000 - GoTime) / During, firstPos.y + DistanceY * (Time.time * 1000 - GoTime) / During, firstPos.z);
+            isBeatPoint = true;
+            GoTime = Time.time * 1000;
+        }
+
+        //フラグが真の場合、非表示位置に向けて移動を行う
+        if (isBeatPoint)
+        {
+            this.gameObject.transform.position = new Vector3(BeatPoint.transform.position.x + HidePoint.transform.position.x * (Time.time * 1000 - GoTime) / afterBeatPointDuration, 
+                BeatPoint.transform.position.y + HidePoint.transform.position.y * (Time.time * 1000 - GoTime) / afterBeatPointDuration, 
+                BeatPoint.transform.position.z);
+
         }
     }
 
@@ -45,6 +71,17 @@ public class NoteController : MonoBehaviour
         //ノーツのタイプ・始動タイミングを設定する
         Type = type;
         Timing = timing;
+
+        //ノーツのタイプに応じて押下位置以降の移動時間を設定する
+        if(Type == "Potate"
+            || Type == "Carrot")
+        {
+            afterBeatPointDuration = 200;
+        }
+        else
+        {
+            afterBeatPointDuration = 300;
+        }
     }
 
     public string getType()
@@ -83,7 +120,7 @@ public class NoteController : MonoBehaviour
         float startTime = Time.timeSinceLevelLoad;  //シーンをロードしてからの経過時間　関数の開始時間
         float rate = 0f;
 
-        Debug.Log("startTime:" + startTime);
+        //Debug.Log("startTime:" + startTime);
 
         while (true)
         {
@@ -106,8 +143,8 @@ public class NoteController : MonoBehaviour
         var a = Vector3.Lerp(p0, p1, t);
         var b = Vector3.Lerp(p1, p2, t);
 
-        Debug.Log("a:" + a);
-        Debug.Log("b:" + b);
+        //Debug.Log("a:" + a);
+        //Debug.Log("b:" + b);
 
         return Vector3.Lerp(a, b, t);
     }

@@ -1,0 +1,10 @@
+{
+	"title": "Pop_swing",
+	"bpm": "120",
+	"length": "102000",
+	"notes":[
+		{"timing": "3500", "type": "Carrot"},
+		{"timing": "4500", "type": "Potate"},
+		{"timing": "5500", "type": "Meat"}
+	]
+}

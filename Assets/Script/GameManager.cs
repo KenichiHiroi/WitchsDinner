@@ -11,6 +11,9 @@ public class GameManager : MonoBehaviour
     public AudioClip BGM;
 
     [SerializeField] GameObject Vegetables; //通常ノーツのプレファブ
+    [SerializeField] GameObject Potate; //通常ノーツのプレファブ
+    [SerializeField] GameObject Carrot; //通常ノーツのプレファブ
+
     [SerializeField] GameObject Meat;       //特殊ノーツのプレファブ
 
     [SerializeField] Transform SpawnPointTransform;  //ノーツの出現位置
@@ -23,6 +26,7 @@ public class GameManager : MonoBehaviour
     float ParabolaHeight;
     float ParabolaHeightMeat;   //放物線の高さ
     float ParabolaHeightVegetables;   //放物線の高さ
+
 
 
 
@@ -48,10 +52,17 @@ public class GameManager : MonoBehaviour
 
     //得点計算用変数
     float AddPoint;     //加算する得点
-    float TotalScore;   //合計得点
+    public static float TotalScore;   //合計得点
+
+    //猫アニメーション用変数
+    GameObject CatController;   //ノーツ始動時のアニメーションで使用
+    bool isCrouch;
 
     //効果音再生用変数
     GameObject SEController;    //ボタン押下時のSE再生で利用
+
+    //エフェクト再生用変数
+    GameObject VEController;
 
     //楽曲終了判定用
     float SongLength;
@@ -78,7 +89,7 @@ public class GameManager : MonoBehaviour
         BeatPosition = new Vector3(BeatPoint.transform.position.x, BeatPoint.transform.position.y, 0);
 
         ParabolaHeightVegetables = 4;
-        ParabolaHeightMeat = 6;
+        ParabolaHeightMeat = 7;
 
 
         During = 600;
@@ -92,16 +103,15 @@ public class GameManager : MonoBehaviour
 
         TotalScore = 0;
 
+        CatController = GameObject.Find("Cat");
         SEController = GameObject.Find("SoundEffectController");
+        VEController = GameObject.Find("VisualEffectController");
         LoadTime = Time.time*1000;
 
+        isCrouch = false;
 
         loadChart();
         loadMusic();
-
-        //Music.Play();
-        //PlayTime = Time.time * 1000;
-        //isPlaying = true;
 
         NowTimeText = TimeText.GetComponent<Text>();
 
@@ -146,15 +156,27 @@ public class GameManager : MonoBehaviour
             }
 
         }
-        
 
-        if(isPlaying
+        //ノーツ始動0.5秒前にノーツの出現と猫の状態を「かがみ」に変更する
+        if (isPlaying
+            && Notes.Count > GoIndex
+            && (Notes[GoIndex].GetComponent<NoteController>().getTiming() - 300) <= (Time.time * 1000 - PlayTime) + During
+            && isCrouch == false) //次のノーツの押下タイミングと（現在の時間+飛翔時間）を比較し、始動タイミングか判定する
+        {
+            CatController.GetComponent<CatController>().transitionCrouch();
+            isCrouch = true;
+        }
+
+        if (isPlaying
             && Notes.Count > GoIndex
             && Notes[GoIndex].GetComponent<NoteController>().getTiming() <= (Time.time * 1000 - PlayTime) + During) //次のノーツの押下タイミングと（現在の時間+飛翔時間）を比較し、始動タイミングか判定する
         {
+            CatController.GetComponent<CatController>().transitionThrow();
+            isCrouch = false;
+
             //Notes[GoIndex].GetComponent<NoteController>().go(DistanceX,DistanceY, During); //go関数を呼び出す
             Notes[GoIndex].GetComponent<NoteController>().StartThrow(ParabolaHeight, SpawnPosition, BeatPosition, During); //対象ノーツの始動関数を呼び出す
-            Debug.Log("go関数：" + Time.time * 1000);
+            //Debug.Log("go関数：" + Time.time * 1000);
             GoIndex++;
 
         }
@@ -183,19 +205,23 @@ public class GameManager : MonoBehaviour
             float timing = float.Parse(note["timing"].Get<string>());   //ノーツの出現タイミングを取得し、数値に変換
             
             GameObject Note;
-            if(type == "Vegetables")
+            if(type == "Potate")
             {
-                Note = Instantiate(Vegetables, SpawnPointTransform.position, Quaternion.identity);   //Instantiate(生成するオブジェクト, 位置, 回転) Quaternion.identity → 回転させない
+                Note = Instantiate(Potate, SpawnPointTransform.position, Quaternion.identity);   //Instantiate(生成するオブジェクト, 位置, 回転) Quaternion.identity → 回転させない
             }
-            else if(type == "Meat")
+            else if(type == "Carrot")
+            {
+                Note = Instantiate(Carrot, SpawnPointTransform.position, Quaternion.identity);
+            }
+            else if (type == "Meat")
             {
                 Note = Instantiate(Meat, SpawnPointTransform.position, Quaternion.identity);
             }
             else
             {
-                Note = Instantiate(Vegetables, SpawnPointTransform.position, Quaternion.identity);       //例外は通常ノーツ
+                Note = Instantiate(Potate, SpawnPointTransform.position, Quaternion.identity);       //例外は通常ノーツ
             }
-
+            Debug.Log("setParameter 前");
             //setParameter関数を実行
             Note.GetComponent<NoteController>().setParameter(type, timing);
 
@@ -215,10 +241,6 @@ public class GameManager : MonoBehaviour
         Music.clip = (AudioClip)Resources.Load(MusicPath);
 
         Music.Stop();
-        ////Music.Play();
-        //Debug.Log("音楽開始：" + Time.time * 1000);
-        //PlayTime = Time.time * 1000;
-        //isPlaying = true;
 
         Debug.Log("Finish loadMusic()");
     }
@@ -250,22 +272,36 @@ public class GameManager : MonoBehaviour
         //対象ノーツの押下タイミングとの差に応じて評価を行う
         if (minDiff != -1 & minDiff < CheckRange)    //並以上の評価の場合は次に進む
         {
+            SEController.GetComponent<SoundEffectController>().PlaySE_BeatGood();
+            VEController.GetComponent<VisualEffectController>().PlayVE_Smoke(Notes[minDiffIndex].transform.position.x, Notes[minDiffIndex].transform.position.y);
+
+            if (Notes[minDiffIndex].GetComponent<NoteController>().getType() == "Carrot")
+            {
+                VEController.GetComponent<VisualEffectController>().PlayVE_Carrot(Notes[minDiffIndex].transform.position.x, Notes[minDiffIndex].transform.position.y);
+            }
+            else if (Notes[minDiffIndex].GetComponent<NoteController>().getType() == "Potate")
+            {
+                VEController.GetComponent<VisualEffectController>().PlayVE_Potate(Notes[minDiffIndex].transform.position.x, Notes[minDiffIndex].transform.position.y);
+            }
+            else if (Notes[minDiffIndex].GetComponent<NoteController>().getType() == "Meat")
+            {
+                VEController.GetComponent<VisualEffectController>().PlayVE_Meat(Notes[minDiffIndex].transform.position.x, Notes[minDiffIndex].transform.position.y);
+            }
+            else
+            {
+                Debug.Log("ボタン押下タイミング　ノーツタイプの設定ミス");
+            }
+
+            NoteTiming[minDiffIndex] = -1;          //判定を行ったノーツの押下タイミング値を-1に書き換える
+            Notes[minDiffIndex].SetActive(false);   //対象のノーツを非表示にする
+
             if (minDiff < BeatRange)    //良評価の処理
             {
-                SEController.GetComponent<SoundEffectController>().PlaySE_BeatGood();
-
-
-                NoteTiming[minDiffIndex] = -1;          //判定を行ったノーツの押下タイミング値を-1に書き換える
-                Notes[minDiffIndex].SetActive(false);   //対象のノーツを非表示にする
                 TotalScore += AddPoint;                
             }
             else //並評価の処理
             {
-                SEController.GetComponent<SoundEffectController>().PlaySE_BeatGood();
-
-                NoteTiming[minDiffIndex] = -1;          //判定を行ったノーツの押下タイミング値を-1に書き換える
-                Notes[minDiffIndex].SetActive(false);   //対象のノーツを非表示にする
-                TotalScore += AddPoint / 2;
+                TotalScore += AddPoint / 2;             //加点は半分
             }
         }
         else //不可評価の処理
