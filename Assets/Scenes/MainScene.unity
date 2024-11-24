@@ -1009,7 +1009,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 946432ea53f00684f9c852ebe7a18565, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ChartPath: Charts/TestChart1
+  ChartPath: Charts/Chart1
   MusicPath: Charts/Pop_swing
   BGM: {fileID: 8300000, guid: 315023e58b62d0b419e8806faf919c0e, type: 3}
   Vegetables: {fileID: 5458882611021037305, guid: 08c8fe3938ccf7542a42a24c38efbc52, type: 3}
