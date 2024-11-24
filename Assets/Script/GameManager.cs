@@ -50,7 +50,14 @@ public class GameManager : MonoBehaviour
     float BeatRange;    //良判定が出る範囲
 
     //時間関連
-    float PlayTime;     //音楽開始の時間
+    float LoadTime;                 //シーン読み込み時の時間
+    float PlayTime;                 //楽曲開始時の時間
+
+    float TimeElapsed;              //ゲーム開始からの経過時間
+    float TimeElapsed_Load;         //シーン読み込みからの経過時間
+    float TimeElapsed_PlayMusic;    //楽曲開始からの経過時間
+
+
 
 
     //得点計算用変数
@@ -74,18 +81,14 @@ public class GameManager : MonoBehaviour
     //秒数表示UI用
     public GameObject TimeText;
     Text NowTimeText;
-    float NowTime;
 
     //問題調査用
-    float LoadTime;
 
     float ingameTime;
 
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Start Time" + Time.time * 1000);
-
         DistanceX = Mathf.Abs(BeatPointTransform.position.x-SpawnPointTransform.position.x);
         DistanceY = Mathf.Abs(BeatPointTransform.position.y-SpawnPointTransform.position.y);
         SpawnPosition = new Vector3(SpawnPoint.transform.position.x, SpawnPoint.transform.position.y, 0);
@@ -109,7 +112,8 @@ public class GameManager : MonoBehaviour
         CatController = GameObject.Find("Cat");
         SEController = GameObject.Find("SoundEffectController");
         VEController = GameObject.Find("VisualEffectController");
-        LoadTime = Time.time*1000;
+        LoadTime = Time.time * 1000;
+        PlayTime = 0;
 
         isCrouch = false;
 
@@ -123,16 +127,19 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        NowTime = Time.time * 1000 - PlayTime;
-        NowTimeText.text = NowTime.ToString();
+        //経過時間の変数を更新
+        TimeElapsed = Time.time * 1000;                    //全体の経過時間
+        TimeElapsed_Load = TimeElapsed - LoadTime;         //シーン読み込みからの経過時間
+        TimeElapsed_PlayMusic = TimeElapsed - PlayTime;    //楽曲再生からの経過時間
+        NowTimeText.text = TimeElapsed_PlayMusic.ToString();
 
-
+        //楽曲開始の判定
         if (isPlaying == false
-            && (Time.time * 1000 - LoadTime) >= 2000)
+            && TimeElapsed_Load >= 2000)
         {
-            Debug.Log("音楽開始：" + Time.time * 1000);
             Music.Play();
-            PlayTime = Time.time * 1000;
+            PlayTime = TimeElapsed;
+            TimeElapsed_PlayMusic = TimeElapsed - PlayTime;    //楽曲再生からの経過時間
             isPlaying = true;
         }
 
@@ -140,7 +147,7 @@ public class GameManager : MonoBehaviour
         if (isPlaying
             && Input.GetMouseButtonDown(0))
         {
-            beat(Time.time * 1000 - PlayTime);
+            beat(TimeElapsed_PlayMusic);
         }
 
         //次に起動するノーツのタイプを参照し、押下までの時間を設定する
@@ -185,8 +192,13 @@ public class GameManager : MonoBehaviour
 
         }
 
-        if(Time.time * 1000 - PlayTime > SongLength)
+        //リザルト画面へ遷移
+        if(isPlaying
+           && TimeElapsed_PlayMusic > SongLength)
         {
+
+            Debug.Log("TimeElapsed_PlayMusic:" + TimeElapsed_PlayMusic);
+            Debug.Log("SongLength:" + SongLength);
             SceneManager.LoadScene("Result");
         }
     }
@@ -225,7 +237,7 @@ public class GameManager : MonoBehaviour
             {
                 Note = Instantiate(Potate, SpawnPointTransform.position, Quaternion.identity);       //例外は通常ノーツ
             }
-            Debug.Log("setParameter 前");
+
             //setParameter関数を実行
             Note.GetComponent<NoteController>().setParameter(type, timing);
 
@@ -238,7 +250,6 @@ public class GameManager : MonoBehaviour
         //取得したノーツの数を元にノーツごとの得点を計算する
         AddPoint = 100 / Notes.Count;
 
-        Debug.Log("Finish loadChart()");
     }
 
     void loadMusic()
@@ -248,7 +259,6 @@ public class GameManager : MonoBehaviour
 
         Music.Stop();
 
-        Debug.Log("Finish loadMusic()");
     }
 
     void beat(float timing)

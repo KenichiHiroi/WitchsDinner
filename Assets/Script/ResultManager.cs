@@ -19,14 +19,14 @@ public class ResultManager : MonoBehaviour
     public AudioClip GoodRatingSE;
     public AudioClip NormalRatingSE;
 
-    //テスト用
-    bool isGood;
+    //時間管理
+    float LoadTime;     //シーン読み込み時間
 
     // Start is called before the first frame update
     void Start()
     {
-        //テスト用
-        isGood = true;
+        //シーン読み込み時間を設定
+        LoadTime = Time.time;
 
         //画像・テキストの初期化
         GoodRatingPicture.SetActive(false);
@@ -37,8 +37,7 @@ public class ResultManager : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
 
         //合計得点に応じて、画像・テキストを表示する
-        if(GameManager.TotalScore >= 60)
-        //if(isGood)
+        if(GameManager.TotalScore >= 80)
         {
             GoodRatingPicture.SetActive(true);
             RatingText.GetComponent<Text>().text = "大満足の美味しいカレーになりました！";
@@ -57,7 +56,7 @@ public class ResultManager : MonoBehaviour
     {
         //シーン読み込みの3秒後にタイトル画面への案内テキストを表示する
         if(InfomationText.activeSelf == false
-            && Time.time > 3)
+            && (Time.time - LoadTime) > 3)
         {
             InfomationText.SetActive(true);
         }
@@ -66,7 +65,6 @@ public class ResultManager : MonoBehaviour
         if (InfomationText.activeSelf
             && Input.GetMouseButton(0))
         {
-            //SceneManager.UnloadSceneAsync("MainScene");
             SceneManager.LoadScene("Title");
         }
     }
