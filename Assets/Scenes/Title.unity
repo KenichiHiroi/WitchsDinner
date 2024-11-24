@@ -660,7 +660,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 785f1ac7e2f56cd4bb440ad079660b16, type: 3}
-    m_FontSize: 164
+    m_FontSize: 116
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 7
@@ -671,7 +671,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: WichsDinner
+  m_Text: "\u30EA\u30BA\u30E0\u30AF\u30C3\u30AD\u30F3\u30B0"
 --- !u!222 &1484149132
 CanvasRenderer:
   m_ObjectHideFlags: 0
