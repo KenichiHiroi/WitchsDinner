@@ -38,7 +38,6 @@ public class GameManager : MonoBehaviour
 
     AudioSource Music;      //楽曲制御用コンポーネント  Pop swing   DOVA-SYNDROME様　(https://dova-s.jp/bgm/play9758.html)
 
-    float PlayTime;     //プレイ開始の時間
     float DistanceX;    //ノーツの初期位置から叩く位置までのX軸の距離
     float DistanceY;    //同上　Y軸の距離
     float During;       //ノーツの初期位置から叩く位置までの時間
@@ -49,6 +48,10 @@ public class GameManager : MonoBehaviour
 
     float CheckRange;   //押下判定が出る範囲
     float BeatRange;    //良判定が出る範囲
+
+    //時間関連
+    float PlayTime;     //音楽開始の時間
+
 
     //得点計算用変数
     float AddPoint;     //加算する得点
@@ -163,6 +166,7 @@ public class GameManager : MonoBehaviour
             && (Notes[GoIndex].GetComponent<NoteController>().getTiming() - 300) <= (Time.time * 1000 - PlayTime) + During
             && isCrouch == false) //次のノーツの押下タイミングと（現在の時間+飛翔時間）を比較し、始動タイミングか判定する
         {
+            Notes[GoIndex].SetActive(true);
             CatController.GetComponent<CatController>().transitionCrouch();
             isCrouch = true;
         }
@@ -227,6 +231,8 @@ public class GameManager : MonoBehaviour
 
             Notes.Add(Note);
             NoteTiming.Add(timing);
+
+            Note.SetActive(false);
         }
 
         //取得したノーツの数を元にノーツごとの得点を計算する

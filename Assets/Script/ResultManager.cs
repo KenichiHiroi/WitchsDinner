@@ -66,6 +66,7 @@ public class ResultManager : MonoBehaviour
         if (InfomationText.activeSelf
             && Input.GetMouseButton(0))
         {
+            //SceneManager.UnloadSceneAsync("MainScene");
             SceneManager.LoadScene("Title");
         }
     }

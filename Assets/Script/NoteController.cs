@@ -63,6 +63,12 @@ public class NoteController : MonoBehaviour
                 BeatPoint.transform.position.z);
 
         }
+
+        if(this.gameObject.transform.position.x < HidePoint.transform.position.x
+            && this.gameObject.transform.position.y < HidePoint.transform.position.y)
+        {
+            this.gameObject.SetActive(false);
+        }
     }
 
     //各ノーツ作成時にGameManagerから呼び出される

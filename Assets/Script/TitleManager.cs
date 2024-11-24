@@ -36,6 +36,7 @@ public class TitleManager : MonoBehaviour
 
     void LoadMainScene()
     {
+        Debug.Log("Load MainScene");
         SceneManager.LoadScene("MainScene");
     }
 

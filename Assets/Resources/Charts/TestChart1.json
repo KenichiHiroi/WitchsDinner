@@ -3,8 +3,78 @@
 	"bpm": "120",
 	"length": "102000",
 	"notes":[
-		{"timing": "3500", "type": "Carrot"},
-		{"timing": "4500", "type": "Potate"},
-		{"timing": "5500", "type": "Meat"}
+		{"timing": "3500", "type": "Potate"},
+		{"timing": "7500", "type": "Carrot"},
+		{"timing": "11500", "type": "Potate"},
+		{"timing": "15500", "type": "Meat"},
+	
+		{"timing": "17500", "type": "Potate"},
+		{"timing": "19500", "type": "Carrot"},
+		{"timing": "21500", "type": "Potate"},
+		{"timing": "23500", "type": "Carrot"},
+
+		{"timing": "25500", "type": "Potate"},
+		{"timing": "27500", "type": "Carrot"},
+
+		{"timing": "31500", "type": "Meat"},
+		
+		{"timing": "33500", "type": "Potate"},
+		{"timing": "35500", "type": "Carrot"},
+		{"timing": "37500", "type": "Potate"},
+		{"timing": "39500", "type": "Carrot"},
+
+		{"timing": "41500", "type": "Potate"},
+		{"timing": "43500", "type": "Carrot"},
+
+		{"timing": "47500", "type": "Meat"},
+
+
+		{"timing": "56500", "type": "Potate"},
+		{"timing": "58500", "type": "Carrot"},
+		{"timing": "60500", "type": "Potate"},
+		{"timing": "62500", "type": "Meat"},
+		
+		
+		{"timing": "64500", "type": "Potate"},
+		{"timing": "65500", "type": "Carrot"},
+		{"timing": "66500", "type": "Potate"},
+		{"timing": "67500", "type": "Carrot"},
+		
+		{"timing": "68500", "type": "Potate"},
+		{"timing": "69500", "type": "Carrot"},
+
+		{"timing": "71500", "type": "Meat"},
+
+		{"timing": "72500", "type": "Potate"},
+		{"timing": "73500", "type": "Carrot"},
+		{"timing": "74500", "type": "Potate"},
+		{"timing": "75500", "type": "Carrot"},
+		
+		{"timing": "76500", "type": "Potate"},
+		{"timing": "77500", "type": "Carrot"},
+
+		{"timing": "79500", "type": "Meat"},
+
+		{"timing": "80500", "type": "Potate"},
+		{"timing": "81500", "type": "Carrot"},
+		{"timing": "82500", "type": "Potate"},
+		{"timing": "83500", "type": "Carrot"},
+		
+		{"timing": "84500", "type": "Potate"},
+		{"timing": "85500", "type": "Carrot"},
+
+		{"timing": "87500", "type": "Meat"},
+
+		{"timing": "88500", "type": "Potate"},
+		{"timing": "89500", "type": "Carrot"},
+		{"timing": "90500", "type": "Potate"},
+		{"timing": "91500", "type": "Carrot"},
+		
+		{"timing": "92500", "type": "Potate"},
+		{"timing": "93500", "type": "Carrot"},
+
+		{"timing": "95500", "type": "Meat"},
+
+		
 	]
 }
