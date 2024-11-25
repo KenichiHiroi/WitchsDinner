@@ -10,12 +10,16 @@ public class TitleManager : MonoBehaviour
 
     AudioSource audioSource;    //コンポーネント
 
+    float LoadTime; //画面ロード時の時間
+
     // Start is called before the first frame update
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
 
         audioSource.PlayOneShot(TitleJingle);
+
+        LoadTime = Time.time;
     }
 
     // Update is called once per frame
@@ -26,8 +30,8 @@ public class TitleManager : MonoBehaviour
         //    SceneManager.LoadScene("MainScene");
         //}
 
-        if(Input.GetMouseButtonDown(0)
-            || Input.GetMouseButtonDown(1))
+        if(Time.time > LoadTime + 3
+           && Input.GetMouseButtonDown(0))
         {
             audioSource.PlayOneShot(TransitionSE);
             Invoke(nameof(LoadMainScene), 1.0f);
