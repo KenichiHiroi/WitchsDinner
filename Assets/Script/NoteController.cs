@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class NoteController : MonoBehaviour
 {
-    bool isGo;  //ノーツ始動フラグ
-    Vector3 firstPos;   //ノーツの初期位置
-
     //ノーツ生成時に取得
     string Type;    //ノーツのタイプ
     float Timing;   //ノーツの出現タイミング
@@ -28,9 +25,6 @@ public class NoteController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        isGo = false;
-        firstPos = this.transform.position;
-
         BeatPoint = GameObject.Find("BeatPoint");
         HidePoint = GameObject.Find("HidePoint");
         isBeatPoint = false;
@@ -41,32 +35,28 @@ public class NoteController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if(isGo)
-        //{
-        //    //ノーツの位置を計算して移動させる
-        //    this.gameObject.transform.position = new Vector3(firstPos.x - DistanceX * (Time.time * 1000 - GoTime) / During, firstPos.y + DistanceY * (Time.time * 1000 - GoTime) / During, firstPos.z);
-        //}
-
-        //押下位置に到達した場合、フラグを真に変更して移動開始時間を記録する
-        if(this.gameObject.transform.position == BeatPoint.transform.position
+        //押下位置の到達を判定
+        if (this.gameObject.transform.position == BeatPoint.transform.position
             && isBeatPoint == false)
         {
             isBeatPoint = true;
             GoTime = Time.time * 1000;
         }
 
-        //フラグが真の場合、非表示位置に向けて移動を行う
+        //押下位置到達後の処理
         if (isBeatPoint)
         {
+            //非表示位置に向けて移動を行う
             this.gameObject.transform.position = new Vector3(BeatPoint.transform.position.x + HidePoint.transform.position.x * (Time.time * 1000 - GoTime) / afterBeatPointDuration, 
                 BeatPoint.transform.position.y + HidePoint.transform.position.y * (Time.time * 1000 - GoTime) / afterBeatPointDuration, 
                 BeatPoint.transform.position.z);
-
         }
 
+        //非表示位置の通過を判定
         if(this.gameObject.transform.position.x < HidePoint.transform.position.x
             && this.gameObject.transform.position.y < HidePoint.transform.position.y)
         {
+            //ノーツを非表示にする
             this.gameObject.SetActive(false);
         }
     }
@@ -100,25 +90,15 @@ public class NoteController : MonoBehaviour
         return Timing;
     }
 
-    //各ノーツの始動時にGameManagerから呼び出される
-    public void go(float distanceX, float distanceY, float during)
+    //ノーツの始動時にGameManagerから呼び出される
+    public void StartThrow(float parabolaHaight, Vector3 spawnPosition, Vector3 beatPosition, float duration)
     {
-        DistanceX = distanceX;
-        DistanceY = distanceY;
-        During = during;
-        GoTime = Time.time * 1000;
-        isGo = true;    //始動フラグをTrueに変更してノーツを動かす
-        SEController.GetComponent<SoundEffectController>().PlaySE_ThrowNotes();
-    }
-
-    public void StartThrow(float height, Vector3 start, Vector3 end, float duration)
-    {
-        // 中点を求める
-        Vector3 half = end - start * 0.50f + start;
-        half.y += Vector3.up.y + height;
+        // 中間地点を求める
+        Vector3 half = beatPosition - spawnPosition * 0.50f + spawnPosition;
+        half.y += Vector3.up.y + parabolaHaight;
 
         SEController.GetComponent<SoundEffectController>().PlaySE_ThrowNotes();
-        StartCoroutine(LerpThrow(start, half, end, duration));
+        StartCoroutine(LerpThrow(spawnPosition, half, beatPosition, duration));
     }
 
     IEnumerator LerpThrow(Vector3 start, Vector3 half, Vector3 end, float duration)
@@ -148,9 +128,6 @@ public class NoteController : MonoBehaviour
     {
         var a = Vector3.Lerp(p0, p1, t);
         var b = Vector3.Lerp(p1, p2, t);
-
-        //Debug.Log("a:" + a);
-        //Debug.Log("b:" + b);
 
         return Vector3.Lerp(a, b, t);
     }
